@@ -1,0 +1,8 @@
+<form method="post" action="{% url 'curriculum:toggle_lesson_complete' lesson.id %}"
+      hx-post="{% url 'curriculum:toggle_lesson_complete' lesson.id %}"
+      hx-target="#completion-slot" hx-swap="innerHTML">
+  {% csrf_token %}
+  <button type="submit" class="theme-toggle">
+    {% if is_completed %}✅ Completed{% else %}⬜ Mark mission complete{% endif %}
+  </button>
+</form>

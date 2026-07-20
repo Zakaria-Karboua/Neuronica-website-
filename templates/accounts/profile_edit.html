@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile — Neuronica{% endblock %}
+
+{% block content %}
+  <h1 class="display-font">Customize Profile</h1>
+
+  <div class="system-card hud-frame" style="max-width:500px;">
+    <form method="post">
+      {% csrf_token %}
+      {% for field in form %}
+        <div style="margin-bottom:1.1rem;">
+          <label style="display:block; color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.3rem;">
+            {{ field.label }}
+          </label>
+          {{ field }}
+          {% if field.errors %}
+            <div style="color:var(--accent-coral); font-size:0.8rem;">{{ field.errors }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <button type="submit" class="hud-button">💾 Save changes</button>
+    </form>
+  </div>
+{% endblock %}

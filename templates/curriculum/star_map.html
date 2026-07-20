@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Neuronica — Star Map{% endblock %}
+
+{% block content %}
+  <h1 class="display-font">Star Map</h1>
+  <p style="color:var(--text-secondary); max-width:60ch;">
+    Every star system below is a phase of the curriculum. Fly through the missions (lessons),
+    dock at stations (projects), and light up each planet as you complete it.
+  </p>
+
+  {% for phase in phases %}
+    <div class="system-card hud-frame" style="animation-delay: {{ forloop.counter0|add:0 }}00ms;">
+      <h2 style="margin-top:0;"><a href="{{ phase.get_absolute_url }}">Phase {{ phase.number }} — {{ phase.title }}</a></h2>
+      {% for lesson in phase.lessons.all %}
+        <div class="planet-row">
+          <span class="planet-dot {% if lesson.id in completed_ids %}lit{% endif %}"></span>
+          <a href="{{ lesson.get_absolute_url }}">{{ lesson.order }}. {{ lesson.title }}</a>
+        </div>
+      {% endfor %}
+      {% for project in phase.projects.all %}
+        <div class="planet-row">
+          <span>🛰️</span>
+          <a href="{{ project.get_absolute_url }}">Station: {{ project.title }}</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% empty %}
+    <p>No phases imported yet. Run <code>python manage.py import_phase ...</code> to get started.</p>
+  {% endfor %}
+{% endblock %}

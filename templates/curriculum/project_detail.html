@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ project.title }} — Neuronica{% endblock %}
+
+{% block content %}
+  <a href="{{ project.phase.get_absolute_url }}" style="color:var(--text-secondary);">&larr; {{ project.phase.title }}</a>
+  <h1 class="display-font">🛰️ Station: {{ project.title }}</h1>
+
+  {% if user.is_authenticated %}
+    <div id="project-completion-slot">
+      {% include "curriculum/_project_completion_button.html" %}
+    </div>
+  {% endif %}
+
+  <div class="lesson-content">
+    {{ project.rendered_html|safe }}
+  </div>
+{% endblock %}

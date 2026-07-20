@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Neuronica — Learn AI Like a Mission{% endblock %}
+
+{% block content %}
+  <section class="hud-scanline" style="text-align:center; padding: 2rem 0 3rem;">
+    <div class="arc-reactor"></div>
+    <div class="hud-label" style="margin-top:1rem;">System online</div>
+    <h1 class="display-font" style="font-size:2.6rem; margin:0.5rem 0;">NEURONICA</h1>
+    <p style="max-width:56ch; margin:0 auto; color:var(--text-secondary); font-size:1.05rem;">
+      A training ground for AI, statistics, and engineering skills — built like a mission log,
+      not a textbook. Every phase is a star system. Every concept is a mission. Every project
+      is a station you dock at and build something real.
+    </p>
+    <div style="display:flex; gap:1rem; justify-content:center; margin-top:2rem; flex-wrap:wrap;">
+      <a href="{% url 'curriculum:star_map' %}" class="hud-button">🚀 Enter the Academy</a>
+      <a href="{% url 'focus:mission_control' %}" class="hud-button secondary">⏱ Mission Control</a>
+    </div>
+  </section>
+
+  <section style="margin-top:2rem;">
+    <div class="hud-label" style="margin-bottom:0.75rem;">// Roadmap</div>
+    <h2 class="display-font" style="margin-top:0;">The Mission Path</h2>
+    <p style="color:var(--text-secondary); max-width:60ch;">
+      New phases get added as the curriculum grows — this is the full flight plan so far.
+    </p>
+
+    <div class="roadmap-track">
+      {% for phase in phases %}
+        <div class="roadmap-node">
+          <div class="hud-label">Phase {{ phase.number }}</div>
+          <h3 style="margin:0.15rem 0;">
+            <a href="{{ phase.get_absolute_url }}">{{ phase.title }}</a>
+          </h3>
+          <p style="color:var(--text-secondary); margin:0.25rem 0;">
+            {{ phase.lessons.count }} mission{{ phase.lessons.count|pluralize }}
+            {% if phase.projects.count %} · {{ phase.projects.count }} station{{ phase.projects.count|pluralize }}{% endif %}
+          </p>
+        </div>
+      {% empty %}
+        <div class="roadmap-node future">
+          <div class="hud-label">Coming soon</div>
+          <p style="color:var(--text-secondary);">No phases imported yet.</p>
+        </div>
+      {% endfor %}
+      <div class="roadmap-node future">
+        <div class="hud-label">Next transmission</div>
+        <p style="color:var(--text-secondary);">More phases incoming as the curriculum expands.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-top:3rem; display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:1rem;">
+    <div class="system-card hud-frame">
+      <div class="hud-label">Missions</div>
+      <p style="color:var(--text-secondary); margin-bottom:0;">Concept lessons pulled straight from the curriculum — read, absorb, mark complete.</p>
+    </div>
+    <div class="system-card hud-frame">
+      <div class="hud-label">Stations</div>
+      <p style="color:var(--text-secondary); margin-bottom:0;">Hands-on projects converted from real notebooks — build things, not just read about them.</p>
+    </div>
+    <div class="system-card hud-frame">
+      <div class="hud-label">Mission Control</div>
+      <p style="color:var(--text-secondary); margin-bottom:0;">A Pomodoro-style focus timer that tracks your time, streaks, and progress automatically.</p>
+    </div>
+  </section>
+{% endblock %}

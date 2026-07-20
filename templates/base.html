@@ -1,0 +1,95 @@
+{% load static %}
+{% load socialaccount %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Neuronica{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- KaTeX for rendering lesson math ($...$ / $$...$$) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"
+          onload="renderMathInElement(document.body, {
+            delimiters: [
+              {left: '$$', right: '$$', display: true},
+              {left: '\\[', right: '\\]', display: true},
+              {left: '$', right: '$', display: false},
+              {left: '\\(', right: '\\)', display: false}
+            ]
+          });"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'css/pygments.css' %}?v=1">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+
+  <nav class="nav">
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+      <a href="{% url 'curriculum:home' %}" class="brand">🛰️ Neuronica</a>
+      <div style="display:flex; align-items:center;">
+        <a href="{% url 'curriculum:home' %}" class="nav-link">Home</a>
+        <a href="{% url 'curriculum:star_map' %}" class="nav-link">Academy</a>
+        <a href="{% url 'focus:mission_control' %}" class="nav-link">Mission Control</a>
+
+        {% if user.is_authenticated %}
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-toggle" id="user-menu-toggle">
+              {{ user.profile.avatar_emoji|default:"🧑‍🚀" }} {{ user.profile.name|default:user.username }} ▾
+            </button>
+            <div class="nav-dropdown-menu" id="user-menu">
+              <a href="{% url 'focus:dashboard' %}">📊 Dashboard</a>
+              <a href="{% url 'accounts:my_profile' %}">👤 Profile</a>
+              <a href="{% url 'account_logout' %}">🚪 Logout</a>
+            </div>
+          </div>
+        {% else %}
+          <div class="nav-dropdown">
+            <button class="nav-dropdown-toggle" id="login-menu-toggle">Login ▾</button>
+            <div class="nav-dropdown-menu" id="login-menu">
+              <a href="{% provider_login_url 'google' %}">Login with Google</a>
+              <a href="{% provider_login_url 'github' %}">Login with GitHub</a>
+            </div>
+          </div>
+        {% endif %}
+        <button id="theme-toggle" class="theme-toggle" style="margin-left:1rem;">🌙 Dark</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if user.is_authenticated %}
+    <div id="tutor-tab" class="tutor-tab">🤖 AI Tutor</div>
+    <div id="tutor-panel" class="tutor-panel hud-frame">
+      <div class="tutor-header">
+        <span class="hud-label">// AI Tutor online</span>
+        <button id="tutor-close" class="tutor-close">✕</button>
+      </div>
+      <div id="tutor-messages" class="tutor-messages"></div>
+      <form id="tutor-form" class="tutor-form">
+        <input id="tutor-input" type="text" placeholder="Ask about this lesson..." autocomplete="off">
+        <button type="submit" class="hud-button" style="padding:0.5rem 0.9rem;">➤</button>
+      </form>
+    </div>
+    <script>
+      window.NEURONICA_CURRENT_LESSON_ID = {{ lesson.id|default:"null" }};
+    </script>
+    <script src="{% static 'js/tutor.js' %}?v=1"></script>
+  {% endif %}
+
+  <script src="{% static 'js/theme.js' %}?v=2"></script>
+  <script src="{% static 'js/nav.js' %}?v=1"></script>
+  <script src="{% static 'js/starfield.js' %}?v=1"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

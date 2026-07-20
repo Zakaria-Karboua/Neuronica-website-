@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Mission Control — Neuronica{% endblock %}
+
+{% block content %}
+  <h1 class="display-font">Mission Control</h1>
+  <p style="color:var(--text-secondary);">Launch a focus block. Land safely during breaks.</p>
+
+  <div class="system-card hud-frame" style="text-align:center; max-width:420px; margin:0 auto;">
+    {% if user.is_authenticated %}
+      <label for="lesson-select" style="display:block; margin-bottom:0.75rem; color:var(--text-secondary);">Mission target</label>
+      <select id="lesson-select" style="width:100%; padding:0.5rem; margin-bottom:1.5rem; background:var(--bg-void); color:var(--text-primary); border:1px solid var(--border-subtle); border-radius:8px;">
+        <option value="">— No specific lesson —</option>
+        {% for lesson in lessons %}
+          <option value="{{ lesson.id }}">{{ lesson.phase.number }}.{{ lesson.order }} {{ lesson.title }}</option>
+        {% endfor %}
+      </select>
+    {% else %}
+      <p style="color:var(--accent-coral);">Log in with Google or GitHub to track your focus time.</p>
+    {% endif %}
+
+    <svg class="orbit-ring" width="220" height="220" viewBox="0 0 220 220">
+      <circle class="track" cx="110" cy="110" r="100" stroke-width="10" fill="none"></circle>
+      <circle id="progress-ring" class="progress" cx="110" cy="110" r="100" stroke-width="10" fill="none"
+              stroke-dasharray="628" stroke-dashoffset="0"></circle>
+    </svg>
+    <div id="timer-display" style="font-size:2.5rem; font-family:'Orbitron'; margin:1rem 0;">25:00</div>
+    <div id="phase-label" style="color:var(--accent-cyan); margin-bottom:1rem;">FOCUS</div>
+
+    <div style="display:flex; gap:0.75rem; justify-content:center;">
+      <button id="start-btn" class="theme-toggle">🚀 Launch</button>
+      <button id="pause-btn" class="theme-toggle">⏸ Hold</button>
+      <button id="reset-btn" class="theme-toggle">🔄 Reset</button>
+    </div>
+
+    <div style="margin-top:1.5rem; display:flex; gap:1rem; justify-content:center; font-size:0.85rem; color:var(--text-secondary);">
+      <label><input type="radio" name="duration" value="25" checked> 25/5</label>
+      <label><input type="radio" name="duration" value="50"> 50/10</label>
+    </div>
+  </div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  window.NEURONICA_USER_AUTHENTICATED = {{ user.is_authenticated|yesno:"true,false" }};
+  window.NEURONICA_CSRF_TOKEN = "{{ csrf_token }}";
+</script>
+<script src="{% static 'js/timer.js' %}"></script>
+{% endblock %}

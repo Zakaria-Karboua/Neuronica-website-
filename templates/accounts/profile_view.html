@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}{{ profile.name }} — Neuronica{% endblock %}
+
+{% block content %}
+  <div class="system-card hud-frame" style="display:flex; gap:1.5rem; align-items:center; flex-wrap:wrap;">
+    <div class="avatar-circle">{{ profile.avatar_emoji }}</div>
+    <div style="flex:1; min-width:200px;">
+      <h1 class="display-font" style="margin:0;">{{ profile.name }}</h1>
+      <span class="tier-pill">{{ tier }}</span>
+      {% if profile.bio %}<p style="color:var(--text-secondary); margin-top:0.75rem;">{{ profile.bio }}</p>{% endif %}
+      {% if profile.github_url or profile.website_url %}
+        <div style="margin-top:0.5rem; font-size:0.9rem;">
+          {% if profile.github_url %}<a href="{{ profile.github_url }}">GitHub</a>{% endif %}
+          {% if profile.github_url and profile.website_url %} · {% endif %}
+          {% if profile.website_url %}<a href="{{ profile.website_url }}">Website</a>{% endif %}
+        </div>
+      {% endif %}
+    </div>
+    {% if is_own_profile %}
+      <a href="{% url 'accounts:profile_edit' %}" class="hud-button">✎ Edit profile</a>
+    {% endif %}
+  </div>
+
+  <div class="system-card hud-frame">
+    <div class="hud-label">XP — {{ xp }} pts</div>
+    <div class="xp-bar-track" style="margin-top:0.5rem;">
+      <div class="xp-bar-fill" style="width: {{ tier_progress_percent }}%;"></div>
+    </div>
+    {% if next_tier %}
+      <p style="color:var(--text-secondary); font-size:0.85rem; margin-top:0.4rem;">
+        {{ xp_to_next }} XP to reach {{ next_tier }}
+      </p>
+    {% else %}
+      <p style="color:var(--accent-gold); font-size:0.85rem; margin-top:0.4rem;">Maximum tier reached 🏆</p>
+    {% endif %}
+  </div>
+
+  <div class="system-card hud-frame" style="display:flex; gap:2rem; flex-wrap:wrap;">
+    <div>
+      <div style="color:var(--text-secondary); font-size:0.85rem;">Missions completed</div>
+      <div style="font-size:1.6rem; font-family:'Orbitron';">{{ lessons_completed }}</div>
+    </div>
+    <div>
+      <div style="color:var(--text-secondary); font-size:0.85rem;">Stations completed</div>
+      <div style="font-size:1.6rem; font-family:'Orbitron';">{{ projects_completed }}</div>
+    </div>
+    {% if streak %}
+      <div>
+        <div style="color:var(--text-secondary); font-size:0.85rem;">Current streak</div>
+        <div style="font-size:1.6rem; font-family:'Orbitron';">{{ streak.current_streak }} 🔥</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="system-card hud-frame">
+    <h3 style="margin-top:0;">Trophies</h3>
+    {% if trophies %}
+      <div class="trophy-grid">
+        {% for t in trophies %}
+          <div class="trophy-badge">
+            <span class="icon">{{ t.achievement.icon }}</span>
+            <span class="title">{{ t.achievement.title }}</span>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p style="color:var(--text-secondary);">No trophies yet — complete a mission to earn your first one.</p>
+    {% endif %}
+  </div>
+{% endblock %}

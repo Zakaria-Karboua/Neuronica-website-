@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}{{ phase.title }} — Neuronica{% endblock %}
+
+{% block content %}
+  <a href="{% url 'curriculum:star_map' %}" style="color:var(--text-secondary);">&larr; Star Map</a>
+  <h1 class="display-font">Phase {{ phase.number }} — {{ phase.title }}</h1>
+  {% if phase.description %}<p style="color:var(--text-secondary);">{{ phase.description }}</p>{% endif %}
+
+  <div class="system-card hud-frame">
+    <h3>Missions</h3>
+    {% for lesson in phase.lessons.all %}
+      <div class="planet-row">
+        <span class="planet-dot {% if lesson.id in completed_ids %}lit{% endif %}"></span>
+        <a href="{{ lesson.get_absolute_url }}">{{ lesson.order }}. {{ lesson.title }}</a>
+      </div>
+    {% endfor %}
+  </div>
+
+  {% if phase.projects.all %}
+    <div class="system-card hud-frame">
+      <h3>Stations</h3>
+      {% for project in phase.projects.all %}
+        <div class="planet-row">
+          <span>🛰️</span>
+          <a href="{{ project.get_absolute_url }}">{{ project.title }}</a>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — Neuronica{% endblock %}
+
+{% block content %}
+  <h1 class="display-font">Pilot Dashboard</h1>
+
+  <div class="system-card hud-frame" style="display:flex; gap:2rem; flex-wrap:wrap;">
+    <div>
+      <div style="color:var(--text-secondary); font-size:0.85rem;">Current streak</div>
+      <div style="font-size:2rem; font-family:'Orbitron';">{{ streak.current_streak }} 🔥</div>
+    </div>
+    <div>
+      <div style="color:var(--text-secondary); font-size:0.85rem;">Longest streak</div>
+      <div style="font-size:2rem; font-family:'Orbitron';">{{ streak.longest_streak }}</div>
+    </div>
+    <div>
+      <div style="color:var(--text-secondary); font-size:0.85rem;">Total focus time</div>
+      <div style="font-size:2rem; font-family:'Orbitron';">{{ total_focus_display }}</div>
+    </div>
+  </div>
+
+  <div class="system-card hud-frame">
+    <h3>Time per mission</h3>
+    {% for name, duration_display in per_lesson %}
+      <div class="planet-row">
+        <span>{{ name }}</span>
+        <span style="margin-left:auto; color:var(--text-secondary);">{{ duration_display }}</span>
+      </div>
+    {% empty %}
+      <p style="color:var(--text-secondary);">No focus sessions logged yet — head to Mission Control to launch one.</p>
+    {% endfor %}
+  </div>
+{% endblock %}

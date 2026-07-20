@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} — Neuronica{% endblock %}
+
+{% block content %}
+  <a href="{{ lesson.phase.get_absolute_url }}" style="color:var(--text-secondary);">&larr; {{ lesson.phase.title }}</a>
+  <h1 class="display-font">{{ lesson.title }}</h1>
+
+  {% if user.is_authenticated %}
+    <div id="completion-slot">
+      {% include "curriculum/_completion_button.html" %}
+    </div>
+  {% endif %}
+
+  <div class="lesson-content">
+    {{ lesson.rendered_html|safe }}
+  </div>
+
+  <div style="display:flex; justify-content:space-between; margin-top:2rem;">
+    <div>{% if prev_lesson %}<a href="{{ prev_lesson.get_absolute_url }}">&larr; {{ prev_lesson.title }}</a>{% endif %}</div>
+    <div>{% if next_lesson %}<a href="{{ next_lesson.get_absolute_url }}">{{ next_lesson.title }} &rarr;</a>{% endif %}</div>
+  </div>
+{% endblock %}
