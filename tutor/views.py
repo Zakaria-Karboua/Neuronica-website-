@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET, require_POST
 from curriculum.models import Lesson
 from .models import ChatMessage
 
-GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-2.5-flash-lite')
+GEMINI_MODEL = os.environ.get('GEMINI_MODEL', 'gemini-3.1-flash-lite')
 GEMINI_URL = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
 HISTORY_TURNS = 10          # how many past turns to send back to Gemini for context
