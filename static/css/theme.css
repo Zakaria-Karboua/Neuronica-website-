@@ -100,7 +100,8 @@ a { color: var(--accent-cyan); text-decoration: none; }
   border-bottom: 1px solid var(--border-subtle);
 }
 
-.nav .brand { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; }
+.nav .brand { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.04em; white-space: nowrap; display: inline-flex; align-items: center; gap: 0.5rem; }
+.brand-logo { height: 32px; width: auto; display: block; }
 
 .nav-inner {
   display: flex;

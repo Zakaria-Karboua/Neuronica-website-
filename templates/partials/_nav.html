@@ -1,7 +1,10 @@
+{% load static %}
 {% load socialaccount %}
 <nav class="nav">
   <div class="container nav-inner">
-    <a href="{% url 'curriculum:home' %}" class="brand">🛰️ Neuronica</a>
+    <a href="{% url 'curriculum:home' %}" class="brand">
+      <img src="{% static 'images/logo.png' %}" alt="Neuronica" class="brand-logo"> Neuronica
+    </a>
     <div class="nav-links">
       <a href="{% url 'curriculum:home' %}" class="nav-link">Home</a>
       <a href="{% url 'curriculum:star_map' %}" class="nav-link">Academy</a>
