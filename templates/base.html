@@ -24,7 +24,7 @@
           });"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
-  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=5">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=6">
   <link rel="stylesheet" href="{% static 'css/pygments.css' %}?v=1">
   {% block extra_head %}{% endblock %}
 </head>
@@ -32,9 +32,9 @@
   <canvas id="starfield"></canvas>
 
   <nav class="nav">
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+    <div class="container nav-inner">
       <a href="{% url 'curriculum:home' %}" class="brand">🛰️ Neuronica</a>
-      <div style="display:flex; align-items:center;">
+      <div class="nav-links">
         <a href="{% url 'curriculum:home' %}" class="nav-link">Home</a>
         <a href="{% url 'curriculum:star_map' %}" class="nav-link">Academy</a>
         <a href="{% url 'focus:mission_control' %}" class="nav-link">Mission Control</a>
@@ -59,7 +59,7 @@
             </div>
           </div>
         {% endif %}
-        <button id="theme-toggle" class="theme-toggle" style="margin-left:1rem;">🌙 Dark</button>
+        <button id="theme-toggle" class="theme-toggle">🌙 Dark</button>
       </div>
     </div>
   </nav>

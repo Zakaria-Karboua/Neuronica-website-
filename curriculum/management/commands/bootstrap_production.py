@@ -18,8 +18,34 @@ class Command(BaseCommand):
     help = "One-shot production bootstrap: create superuser + import committed phase content."
 
     def handle(self, *args, **options):
+        self._fix_site_domain()
         self._create_superuser_if_configured()
         self._import_committed_phases()
+
+    def _fix_site_domain(self):
+        """
+        Django ships with a placeholder Site (id=1, domain='example.com').
+        allauth uses this for links/templates, so on a fresh deploy it would
+        otherwise show 'example.com' instead of your real domain. Fix it
+        automatically from DJANGO_ALLOWED_HOSTS (first non-localhost entry).
+        """
+        from django.contrib.sites.models import Site
+
+        hosts = [h.strip() for h in os.environ.get('DJANGO_ALLOWED_HOSTS', '').split(',') if h.strip()]
+        real_hosts = [h for h in hosts if h not in ('localhost', '127.0.0.1')]
+        if not real_hosts:
+            self.stdout.write('No production host found in DJANGO_ALLOWED_HOSTS — skipping site domain fix.')
+            return
+
+        domain = real_hosts[0]
+        site, _ = Site.objects.get_or_create(id=1, defaults={'domain': domain, 'name': 'Neuronica'})
+        if site.domain != domain:
+            site.domain = domain
+            site.name = 'Neuronica'
+            site.save()
+            self.stdout.write(self.style.SUCCESS(f'Updated Site domain to "{domain}".'))
+        else:
+            self.stdout.write(f'Site domain already correct ("{domain}").')
 
     def _create_superuser_if_configured(self):
         User = get_user_model()
