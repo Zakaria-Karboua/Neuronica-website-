@@ -24,45 +24,14 @@
           });"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/htmx/1.9.12/htmx.min.js"></script>
-  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=6">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=7">
   <link rel="stylesheet" href="{% static 'css/pygments.css' %}?v=1">
   {% block extra_head %}{% endblock %}
 </head>
 <body>
   <canvas id="starfield"></canvas>
 
-  <nav class="nav">
-    <div class="container nav-inner">
-      <a href="{% url 'curriculum:home' %}" class="brand">🛰️ Neuronica</a>
-      <div class="nav-links">
-        <a href="{% url 'curriculum:home' %}" class="nav-link">Home</a>
-        <a href="{% url 'curriculum:star_map' %}" class="nav-link">Academy</a>
-        <a href="{% url 'focus:mission_control' %}" class="nav-link">Mission Control</a>
-
-        {% if user.is_authenticated %}
-          <div class="nav-dropdown">
-            <button class="nav-dropdown-toggle" id="user-menu-toggle">
-              {{ user.profile.avatar_emoji|default:"🧑‍🚀" }} {{ user.profile.name|default:user.username }} ▾
-            </button>
-            <div class="nav-dropdown-menu" id="user-menu">
-              <a href="{% url 'focus:dashboard' %}">📊 Dashboard</a>
-              <a href="{% url 'accounts:my_profile' %}">👤 Profile</a>
-              <a href="{% url 'account_logout' %}">🚪 Logout</a>
-            </div>
-          </div>
-        {% else %}
-          <div class="nav-dropdown">
-            <button class="nav-dropdown-toggle" id="login-menu-toggle">Login ▾</button>
-            <div class="nav-dropdown-menu" id="login-menu">
-              <a href="{% provider_login_url 'google' %}">Login with Google</a>
-              <a href="{% provider_login_url 'github' %}">Login with GitHub</a>
-            </div>
-          </div>
-        {% endif %}
-        <button id="theme-toggle" class="theme-toggle">🌙 Dark</button>
-      </div>
-    </div>
-  </nav>
+  {% include "partials/_nav.html" %}
 
   <main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
     {% block content %}{% endblock %}

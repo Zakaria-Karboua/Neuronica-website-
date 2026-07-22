@@ -1,0 +1,40 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block head_title %}Neuronica{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/theme.css' %}?v=7">
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+
+  {% include "partials/_nav.html" %}
+
+  <main class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+    <div class="system-card hud-frame" style="max-width: 440px; margin: 0 auto;">
+      <div class="hud-label" style="margin-bottom: 0.75rem;">// Authentication</div>
+
+      {% if messages %}
+        <ul style="list-style:none; padding:0; margin:0 0 1rem;">
+          {% for message in messages %}
+            <li style="color: var(--accent-cyan); font-size: 0.9rem; margin-bottom: 0.4rem;">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <script src="{% static 'js/theme.js' %}?v=2"></script>
+  <script src="{% static 'js/nav.js' %}?v=1"></script>
+  <script src="{% static 'js/starfield.js' %}?v=1"></script>
+  {% block extra_body %}{% endblock %}
+</body>
+</html>
