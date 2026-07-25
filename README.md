@@ -1,5 +1,20 @@
 # Neuronica
 
+**Live demo:** https://neuronica.onrender.com *(free-tier hosting — first load after
+inactivity can take 30-60s to wake up)*
+
+<!--
+  TODO: add 3-4 screenshots here before sharing this repo as a portfolio piece —
+  this is usually the first thing a recruiter/reviewer looks at before reading
+  setup instructions. Suggested shots: home page hero, a lesson page (showing
+  syntax highlighting), the profile/trophy page, and Mission Control (Pomodoro timer).
+
+  ![Home page](docs/screenshots/home.png)
+  ![Lesson page](docs/screenshots/lesson.png)
+  ![Profile & trophies](docs/screenshots/profile.png)
+  ![Mission Control](docs/screenshots/mission-control.png)
+-->
+
 A space-themed learning platform: curriculum content (`.md` lessons + `.ipynb` projects)
 grouped into phases ("star systems"), with Google/GitHub login and Pomodoro-style
 focus-time tracking ("Mission Control").
@@ -45,6 +60,11 @@ python3 manage.py import_phase /path/to/phase1_extracted --number 1 --title "Pro
 Run this again any time you add or edit files in that folder — it updates existing
 lessons/projects in place (matched by slug), it doesn't duplicate them.
 
+Preview what a run would do without touching the database:
+```bash
+python3 manage.py import_phase /path/to/phase1_extracted --number 1 --title "..." --dry-run
+```
+
 Adding **Phase 2** later is exactly the same command with `--number 2` and its own folder.
 No code changes needed.
 
@@ -66,6 +86,50 @@ The Google/GitHub OAuth apps you already registered point at:
 
 Once your `.env` has real client IDs/secrets, the "Login with Google" / "Login with GitHub"
 links in the nav bar will work immediately — no extra Django config needed.
+
+## 7. AI Tutor (Gemini-backed chat)
+
+Neuronica includes a right-docked AI tutor (the "🤖 AI Tutor" tab, visible once logged in)
+that answers questions about the curriculum. It's powered by Google's Gemini API, on the
+**free tier** — no cost, but with real rate limits worth understanding before you rely on it.
+
+**What it does:**
+- If you're on a lesson page when you ask a question, that lesson's markdown content is
+  automatically injected into the AI's system prompt — so "explain this part" actually
+  works instead of answering blind. See `tutor/views.py::_build_system_instruction`.
+- Conversation history persists per user in the `ChatMessage` model (`tutor/models.py`),
+  so reopening the panel later shows past questions. The last 10 turns are sent back to
+  Gemini as context on every new question (`HISTORY_TURNS` in `tutor/views.py`).
+- Failure modes are handled gracefully rather than crashing: missing API key → clear
+  "not configured yet" message; Gemini rate-limited (HTTP 429) → "try again in a minute";
+  any other API error → generic retry message. See `tutor/views.py::ask`.
+
+**Setup:**
+1. Get a free key at `https://aistudio.google.com/apikey` (no credit card needed)
+2. Add to `.env`:
+   ```
+   GEMINI_API_KEY=your-key-here
+   GEMINI_MODEL=gemini-3.1-flash-lite
+   ```
+3. That's it — the tutor tab works immediately for any logged-in user
+
+**Rate limits — read this before assuming it'll always work:**
+Gemini's free tier is a quota **per API key, shared across every user of your site** —
+not a per-user allowance. With `gemini-3.1-flash-lite` you get roughly 1,000–1,500
+requests/day total, shared by everyone using Neuronica. If that gets exhausted, users
+see the "try again in a minute" message rather than a broken feature — but it does mean
+a busy day could throttle everyone. If Neuronica grows a real audience, revisit this
+(upgrade to a paid Gemini tier, or split traffic across multiple free-tier keys).
+
+**Model name churn:** Google's Gemini model lineup changes fairly often — model IDs get
+deprecated with only a few months' notice (this happened once already during development:
+`gemini-2.5-flash-lite` was deprecated the same week this project was being built). If the
+tutor suddenly starts returning "AI tutor error (404)", the model name in `GEMINI_MODEL`
+is almost always the cause — check Google's current model list and update the env var.
+
+**API endpoints** (`tutor/urls.py`):
+- `POST /tutor/ask/` — send a question, get a reply (also saves both to history)
+- `GET /tutor/history/` — load recent messages, optionally filtered by `?lesson_id=`
 
 ## Project structure
 

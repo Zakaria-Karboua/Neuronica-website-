@@ -4,6 +4,8 @@ Kept framework-agnostic (plain functions) so it's easy to call from any view
 or signal without circular-import headaches.
 """
 
+from dataclasses import dataclass
+
 XP_PER_LESSON = 50
 XP_PER_PROJECT = 150
 XP_PER_FOCUS_HOUR = 5
@@ -20,24 +22,54 @@ TIERS = [
 ]
 
 
-def compute_xp(user):
-    """Total XP for a user, computed live from their progress records."""
+@dataclass
+class UserStats:
+    """One query pass worth of progress data, shared across XP calc and every achievement rule."""
+    lessons_completed: int
+    projects_completed: int
+    focus_hours: float
+    current_streak: int
+
+
+def _gather_stats(user):
+    """
+    Single query per table, computed once per call site. Previously,
+    check_and_award_achievements called helper functions like
+    _lessons_completed_count() once per matching achievement rule (e.g. 3x
+    for first/five/ten missions), re-hitting the DB each time. Now it's
+    exactly 3 queries total (lessons, projects, streak) no matter how many
+    achievement rules exist.
+    """
     from curriculum.models import LessonProgress, ProjectProgress
     from focus.models import UserStreak
 
-    lessons_done = LessonProgress.objects.filter(user=user, completed=True).count()
-    projects_done = ProjectProgress.objects.filter(user=user, completed=True).count()
+    lessons_completed = LessonProgress.objects.filter(user=user, completed=True).count()
+    projects_completed = ProjectProgress.objects.filter(user=user, completed=True).count()
 
     try:
         streak = UserStreak.objects.get(user=user)
         focus_hours = streak.total_focus_seconds / 3600
+        current_streak = streak.current_streak
     except UserStreak.DoesNotExist:
         focus_hours = 0
+        current_streak = 0
 
+    return UserStats(
+        lessons_completed=lessons_completed,
+        projects_completed=projects_completed,
+        focus_hours=focus_hours,
+        current_streak=current_streak,
+    )
+
+
+def compute_xp(user, stats=None):
+    """Total XP for a user. Pass a pre-fetched `stats` to avoid a redundant query pass."""
+    if stats is None:
+        stats = _gather_stats(user)
     return int(
-        lessons_done * XP_PER_LESSON
-        + projects_done * XP_PER_PROJECT
-        + focus_hours * XP_PER_FOCUS_HOUR
+        stats.lessons_completed * XP_PER_LESSON
+        + stats.projects_completed * XP_PER_PROJECT
+        + stats.focus_hours * XP_PER_FOCUS_HOUR
     )
 
 
@@ -57,41 +89,41 @@ def get_tier(xp):
 
 
 # ---------------------------------------------------------------------------
-# Achievement rules — each returns True if the achievement's condition is met.
+# Achievement rules — each takes a UserStats snapshot (no DB access of its own).
 # Adding a new trophy = add a row here (code, title, description, icon, rule).
 # ---------------------------------------------------------------------------
 
-def _lessons_completed_count(user):
-    from curriculum.models import LessonProgress
-    return LessonProgress.objects.filter(user=user, completed=True).count()
+ACHIEVEMENT_DEFINITIONS = [
+    ('first-mission', 'First Mission', 'Complete your first lesson.', '🎖️',
+     lambda s: s.lessons_completed >= 1),
+    ('five-missions', 'Squadron Ready', 'Complete 5 lessons.', '🥈',
+     lambda s: s.lessons_completed >= 5),
+    ('ten-missions', 'Veteran Pilot', 'Complete 10 lessons.', '🥇',
+     lambda s: s.lessons_completed >= 10),
+    ('first-station', 'First Dock', 'Complete your first project.', '🛰️',
+     lambda s: s.projects_completed >= 1),
+    ('streak-7', 'Week-Long Flight', 'Reach a 7-day streak.', '🔥',
+     lambda s: s.current_streak >= 7),
+    ('streak-30', 'Iron Will', 'Reach a 30-day streak.', '💠',
+     lambda s: s.current_streak >= 30),
+    ('focus-10h', 'Marathon Pilot', 'Log 10 total hours of focus time.', '⏱️',
+     lambda s: s.focus_hours >= 10),
+    ('focus-50h', 'Deep Space Veteran', 'Log 50 total hours of focus time.', '🌌',
+     lambda s: s.focus_hours >= 50),
+]
 
 
-def _projects_completed_count(user):
-    from curriculum.models import ProjectProgress
-    return ProjectProgress.objects.filter(user=user, completed=True).count()
-
-
-def _total_focus_hours(user):
-    from focus.models import UserStreak
-    try:
-        return UserStreak.objects.get(user=user).total_focus_seconds / 3600
-    except UserStreak.DoesNotExist:
-        return 0
-
-
-def _current_streak(user):
-    from focus.models import UserStreak
-    try:
-        return UserStreak.objects.get(user=user).current_streak
-    except UserStreak.DoesNotExist:
-        return 0
-
-
-def _phases_fully_cleared(user):
-    """Returns list of Phase objects where every lesson is completed by this user."""
+def _phases_fully_cleared(user, already_cleared_phase_numbers):
+    """
+    Returns list of Phase objects where every lesson is completed by this
+    user, skipping phases whose "cleared" trophy this user already has —
+    once a phase is cleared it stays cleared, so there's no need to
+    re-query its lessons on every single call.
+    """
     from curriculum.models import Phase, LessonProgress
     cleared = []
-    for phase in Phase.objects.prefetch_related('lessons'):
+    candidates = Phase.objects.exclude(number__in=already_cleared_phase_numbers).prefetch_related('lessons')
+    for phase in candidates:
         lesson_ids = list(phase.lessons.values_list('id', flat=True))
         if not lesson_ids:
             continue
@@ -101,26 +133,6 @@ def _phases_fully_cleared(user):
         if done == len(lesson_ids):
             cleared.append(phase)
     return cleared
-
-
-ACHIEVEMENT_DEFINITIONS = [
-    ('first-mission', 'First Mission', 'Complete your first lesson.', '🎖️',
-     lambda u: _lessons_completed_count(u) >= 1),
-    ('five-missions', 'Squadron Ready', 'Complete 5 lessons.', '🥈',
-     lambda u: _lessons_completed_count(u) >= 5),
-    ('ten-missions', 'Veteran Pilot', 'Complete 10 lessons.', '🥇',
-     lambda u: _lessons_completed_count(u) >= 10),
-    ('first-station', 'First Dock', 'Complete your first project.', '🛰️',
-     lambda u: _projects_completed_count(u) >= 1),
-    ('streak-7', 'Week-Long Flight', 'Reach a 7-day streak.', '🔥',
-     lambda u: _current_streak(u) >= 7),
-    ('streak-30', 'Iron Will', 'Reach a 30-day streak.', '💠',
-     lambda u: _current_streak(u) >= 30),
-    ('focus-10h', 'Marathon Pilot', 'Log 10 total hours of focus time.', '⏱️',
-     lambda u: _total_focus_hours(u) >= 10),
-    ('focus-50h', 'Deep Space Veteran', 'Log 50 total hours of focus time.', '🌌',
-     lambda u: _total_focus_hours(u) >= 50),
-]
 
 
 def check_and_award_achievements(user):
@@ -137,18 +149,25 @@ def check_and_award_achievements(user):
         UserAchievement.objects.filter(user=user).values_list('achievement__code', flat=True)
     )
 
+    stats = _gather_stats(user)
+
     for code, title, description, icon, rule in ACHIEVEMENT_DEFINITIONS:
         if code in already_earned_codes:
             continue
-        if rule(user):
+        if rule(stats):
             achievement, _ = Achievement.objects.get_or_create(
                 code=code, defaults={'title': title, 'description': description, 'icon': icon}
             )
             UserAchievement.objects.create(user=user, achievement=achievement)
             newly_earned.append(achievement)
 
-    # Dynamic per-phase "cleared" trophies (one per phase, generated on demand)
-    for phase in _phases_fully_cleared(user):
+    # Dynamic per-phase "cleared" trophies (one per phase, generated on demand).
+    # Extract phase numbers already cleared so we don't re-query lessons for them.
+    already_cleared_phase_numbers = {
+        int(code.split('-')[1]) for code in already_earned_codes
+        if code.startswith('phase-') and code.endswith('-cleared')
+    }
+    for phase in _phases_fully_cleared(user, already_cleared_phase_numbers):
         code = f"phase-{phase.number}-cleared"
         if code in already_earned_codes:
             continue

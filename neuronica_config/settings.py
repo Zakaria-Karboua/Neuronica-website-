@@ -4,23 +4,31 @@ Django settings for the Neuronica project.
 
 import os
 from pathlib import Path
+from django.core.exceptions import ImproperlyConfigured
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # ---------------------------------------------------------------------------
 # Secrets & environment
 # ---------------------------------------------------------------------------
-# Never hardcode secrets. Read from environment variables, with safe local
-# defaults only for SECRET_KEY/DEBUG so `runserver` works out of the box in dev.
-# Create a `.env` file (see .env.example) and load it with `python-dotenv`
-# in manage.py / wsgi.py, OR export these in your shell before running.
+# SECURITY: DEBUG defaults to False. Set DJANGO_DEBUG=True explicitly for
+# local development. This means a forgotten env var fails safe (no debug
+# info leaked) instead of failing open.
+DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 
-SECRET_KEY = os.environ.get(
-    "DJANGO_SECRET_KEY",
-    "dev-only-insecure-key-change-in-production",
-)
-
-DEBUG = os.environ.get("DJANGO_DEBUG", "True") == "True"
+# SECURITY: SECRET_KEY has no hardcoded production fallback. In DEBUG mode
+# (local dev) it's fine to fall back to an insecure default for convenience.
+# In production (DEBUG=False), a missing key raises immediately at startup
+# rather than silently running with a key an attacker could look up on GitHub.
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY")
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = "dev-only-insecure-key-change-in-production"
+    else:
+        raise ImproperlyConfigured(
+            "DJANGO_SECRET_KEY environment variable must be set when DEBUG=False. "
+            "Generate one with: python -c \"import secrets; print(secrets.token_urlsafe(50))\""
+        )
 
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
