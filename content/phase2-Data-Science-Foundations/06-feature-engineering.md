@@ -48,19 +48,25 @@ For any date/time column: extract cyclical components (day-of-week, month, is-ho
 
 ### Target encoding and its leakage mechanism (formalized)
 Naive target encoding replaces category $c$ with:
+
 $$
 \hat{\mu}_c = \frac{1}{n_c}\sum_{i: x_i = c} y_i
 $$
+
 computed using the *entire* training set including row $i$ itself — this directly encodes $y_i$ into $\hat{\mu}_c$ for row $i$, a textbook leakage case (Lesson 5). The correct approach uses **out-of-fold encoding**: for each row, compute $\hat{\mu}_c$ using only *other folds'* data, or apply additive smoothing toward the global mean:
+
 $$
 \hat{\mu}_c^{\text{smoothed}} = \frac{n_c \bar{y}_c + m \bar{y}}{n_c + m}
 $$
+
 where $m$ is a smoothing strength parameter and $\bar{y}$ the global target mean — shrinking rare categories' estimates toward the global mean, reducing both leakage risk and high-variance overfitting on small categories.
 
 ### Box-Cox transformation (generalizing log transforms)
+
 $$
 y^{(\lambda)} = \begin{cases} \dfrac{y^\lambda - 1}{\lambda} & \lambda \ne 0 \\ \ln(y) & \lambda = 0 \end{cases}
 $$
+
 $\lambda$ is typically chosen via maximum likelihood to best normalize the distribution — the ordinary log transform ($\lambda = 0$) is simply one special case of this more general family.
 
 ### Curse of dimensionality (why one-hot encoding high-cardinality features hurts)

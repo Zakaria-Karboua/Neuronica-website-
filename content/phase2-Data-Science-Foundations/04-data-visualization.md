@@ -44,9 +44,11 @@ Any statistical graphic is built from:
 
 ### Perceptual accuracy ranking (Cleveland & McGill, 1984 — empirically measured, not opinion)
 Humans judge visual encodings with different accuracy, ranked from most to least accurate:
+
 $$
 \text{position (common scale)} > \text{length} > \text{angle/slope} > \text{area} > \text{color/shading}
 $$
+
 This is *why* bar charts (length/position) reliably outperform pie charts (angle) for comparison tasks, and why color should encode categories, not precise magnitude comparisons, whenever position-based alternatives exist.
 
 ---
@@ -55,15 +57,19 @@ This is *why* bar charts (length/position) reliably outperform pie charts (angle
 
 ### Histograms and bin-width selection
 A histogram estimates a probability density by counting observations in bins of width $h$. Bin width dramatically affects the *interpretation* of the same data — too narrow shows noise as structure, too wide hides real structure. Freedman-Diaconis rule (robust to outliers, a good practical default):
+
 $$
 h = 2 \cdot \frac{\text{IQR}(x)}{n^{1/3}}
 $$
+
 using IQR (robust, from Lesson 3) rather than standard deviation makes bin-width selection resistant to the same outlier-distortion problem covered there.
 
 ### Kernel Density Estimation (KDE) — a smoother alternative to histograms
+
 $$
 \hat{f}(x) = \frac{1}{nh} \sum_{i=1}^{n} K\left(\frac{x - x_i}{h}\right)
 $$
+
 where $K$ is a kernel function (commonly Gaussian) and $h$ is the bandwidth (analogous to histogram bin width — the same underlying bias-variance tradeoff: small $h$ = noisy/overfit, large $h$ = oversmoothed).
 
 ### Color perception and colorblind-safe design

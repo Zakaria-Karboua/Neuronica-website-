@@ -24,15 +24,19 @@ Every hyperparameter you'll tune in Phase 4-6 (learning rate, batch size, optimi
 
 ### Convex vs. non-convex optimization
 A function $f$ is **convex** if, for any two points, the line segment connecting them lies *above* the function's graph:
+
 $$
 f(\lambda x + (1-\lambda) y) \le \lambda f(x) + (1-\lambda) f(y), \quad \forall \lambda \in [0,1]
 $$
+
 Convex functions have a crucial guarantee: **any local minimum is the global minimum**. Linear/logistic regression's loss functions are convex (guaranteed convergence to the global optimum); neural network loss surfaces (Phase 5) are decidedly **non-convex** (many local minima, saddle points — Lesson 2's Hessian discussion) — a fundamentally different, harder optimization regime with far weaker theoretical guarantees, yet empirically still trainable.
 
 ### Gradient Descent and its variants
+
 $$
 \theta_{t+1} = \theta_t - \eta \nabla_\theta L(\theta_t)
 $$
+
 where $\eta$ is the **learning rate**. Variants:
 - **Batch GD**: use the full dataset's gradient each step — accurate but slow/memory-heavy for large datasets.
 - **Stochastic GD (SGD)**: use a single random sample's gradient — noisy but cheap, and the noise itself can help escape shallow local minima/saddle points.
@@ -44,9 +48,11 @@ where $\eta$ is the **learning rate**. Variants:
 
 ### Constrained optimization and Lagrange multipliers
 For minimizing $f(x)$ subject to $g(x) = 0$:
+
 $$
 \mathcal{L}(x, \lambda) = f(x) - \lambda g(x), \qquad \nabla_x \mathcal{L} = 0, \quad \nabla_\lambda \mathcal{L} = 0
 $$
+
 At the optimum, the gradients of $f$ and $g$ are parallel — the intuition being that if they weren't parallel, you could slide along the constraint surface to further improve $f$. This is the foundation of Support Vector Machines' margin-maximization formulation (Phase 4) and appears throughout constrained ML formulations.
 
 ---
@@ -55,27 +61,37 @@ At the optimum, the gradients of $f$ and $g$ are parallel — the intuition bein
 
 ### Convergence rate of gradient descent (convex, smooth case)
 For an $L$-smooth convex function (gradient doesn't change too fast, formally $\|\nabla f(x) - \nabla f(y)\| \le L\|x-y\|$), gradient descent with $\eta = 1/L$ achieves:
+
 $$
 f(\theta_t) - f(\theta^*) \le \frac{L\|\theta_0 - \theta^*\|^2}{2t}
 $$
+
 i.e., $O(1/t)$ convergence — the error shrinks *sublinearly*. For **strongly convex** functions (Hessian eigenvalues bounded below by $\mu > 0$, a stronger curvature guarantee), convergence improves to *linear* (geometric): $O(\rho^t)$ for some $\rho < 1$ depending on the condition number $L/\mu$ — this ratio is *why* ill-conditioned problems (Lesson 1's eigenvalue-ratio discussion) converge painfully slowly under plain gradient descent, motivating momentum/adaptive methods and preconditioning.
 
 ### Adam's update rule, derived
+
 $$
 m_t = \beta_1 m_{t-1} + (1-\beta_1) g_t, \qquad v_t = \beta_2 v_{t-1} + (1-\beta_2) g_t^2
 $$
+
+
 $$
 \hat{m}_t = \frac{m_t}{1-\beta_1^t}, \qquad \hat{v}_t = \frac{v_t}{1-\beta_2^t} \qquad \text{(bias correction, crucial early in training)}
 $$
+
+
 $$
 \theta_{t+1} = \theta_t - \eta \frac{\hat{m}_t}{\sqrt{\hat{v}_t} + \epsilon}
 $$
+
 The $\sqrt{\hat{v}_t}$ term in the denominator gives each parameter an *individually scaled* effective learning rate: parameters with historically large/noisy gradients get dampened, parameters with small/consistent gradients get relatively boosted — directly addressing the "different parameters need different learning rates" problem that plagues plain SGD on ill-conditioned loss surfaces.
 
 ### Newton's method (second-order optimization)
+
 $$
 \theta_{t+1} = \theta_t - H^{-1}\nabla f(\theta_t)
 $$
+
 Using the Hessian $H$ (Lesson 2) directly accounts for curvature, achieving **quadratic** convergence near the optimum (far faster than gradient descent's linear/sublinear rates) — but computing/inverting an $n \times n$ Hessian is $O(n^3)$, completely intractable for models with millions/billions of parameters, which is *exactly why* first-order methods (gradient descent variants) dominate deep learning despite their theoretically slower convergence rate — the per-step cost tradeoff decisively favors them at scale.
 
 ---

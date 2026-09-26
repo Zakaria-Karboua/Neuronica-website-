@@ -44,9 +44,11 @@ ML/AI code has a well-earned reputation for being especially messy — notebooks
 
 ### Cyclomatic complexity (McCabe, 1976)
 A quantitative measure of a function's structural complexity, computed from its control-flow graph:
+
 $$
 M = E - N + 2P
 $$
+
 where $E$ = edges, $N$ = nodes, $P$ = connected components (usually 1 per function) in the control-flow graph. Equivalently, $M = (\text{number of decision points}) + 1$. Empirically, $M > 10$ correlates with sharply increasing defect rates — a real, measurable justification for "break this function up," not just aesthetic preference.
 
 ### Coupling and cohesion (graph-theoretic view)
@@ -54,9 +56,11 @@ Model a codebase as a dependency graph $G = (V, E)$ where $V$ = modules and $E$ 
 
 ### The economics of technical debt (a simplified model)
 If $C_0$ is the cost of doing something properly now and $C_1 > C_0$ is the cost of doing it hastily now plus fixing it later, technical debt is rational exactly when:
+
 $$
 C_0 > P(\text{feature survives to need fixing}) \times C_1
 $$
+
 i.e., when the probability-weighted future cost is *less* than the upfront proper-engineering cost — which is why deliberately-incurred technical debt (e.g., in a throwaway research prototype) is a legitimate engineering decision, not always a mistake.
 
 ---

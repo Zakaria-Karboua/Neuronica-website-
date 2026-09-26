@@ -32,9 +32,11 @@ An **estimator** $\hat\theta$ is a function of data used to estimate a populatio
 A $(1-\alpha)$ confidence interval is constructed so that, *over repeated sampling*, it contains the true parameter $(1-\alpha)$ of the time — a subtle, frequently misinterpreted statement (it is **not** "there's a 95% probability the true value is in this specific interval," which is a Bayesian-flavored statement the frequentist framework doesn't license).
 
 ### Hypothesis testing framework
+
 $$
 H_0 \text{ (null hypothesis)}, \quad H_1 \text{ (alternative)}
 $$
+
 A test statistic is computed from data; a **p-value** is the probability of observing a test statistic at least as extreme as the one observed, *assuming $H_0$ is true*. Reject $H_0$ if $p < \alpha$ (significance level, commonly 0.05) — **not** proof $H_1$ is true, only that the observed data would be unusual under $H_0$.
 
 ### Type I / Type II errors and statistical power
@@ -51,16 +53,20 @@ A test statistic is computed from data; a **p-value** is the probability of obse
 
 ### The t-test, derived conceptually
 Comparing two group means $\bar{X}_1, \bar{X}_2$ with pooled standard error $SE$:
+
 $$
 t = \frac{\bar{X}_1 - \bar{X}_2}{SE}, \qquad SE = \sqrt{\frac{s_1^2}{n_1} + \frac{s_2^2}{n_2}}
 $$
+
 Under $H_0$ (equal means), $t$ follows a Student's t-distribution with degrees of freedom determined by the Welch-Satterthwaite equation (for unequal variances) — the t-distribution's heavier tails than the normal (especially at small $n$) correctly account for the extra uncertainty from estimating variance from a finite sample rather than knowing it exactly.
 
 ### Multiple testing correction
 Running $m$ independent hypothesis tests at $\alpha = 0.05$ each gives probability of *at least one* false positive:
+
 $$
 P(\text{at least one Type I error}) = 1 - (1-\alpha)^m
 $$
+
 For $m = 20$ tests, this is already $\approx 64\%$ — a direct mathematical proof of why "testing many features/hypotheses and reporting whichever came back significant" is statistically invalid without correction. **Bonferroni correction**: use $\alpha/m$ per test; **Benjamini-Hochberg (FDR control)**: a less conservative, more commonly used modern alternative controlling the *expected proportion* of false discoveries rather than the probability of any single one.
 
 ### Bootstrap resampling (a modern, distribution-free alternative)
@@ -68,9 +74,11 @@ Given a sample of size $n$, generate $B$ bootstrap samples by resampling *with r
 
 ### Statistical power formalized
 For a two-sample t-test with effect size $d$ (Cohen's d, standardized mean difference), required sample size per group for power $1-\beta$ at significance $\alpha$:
+
 $$
 n \approx \frac{2(z_{\alpha/2} + z_\beta)^2}{d^2}
 $$
+
 This is the formal justification behind "power analysis" — computing, *before* running an experiment, how much data is actually needed to detect a meaningful effect, preventing both wasted resources (overpowered studies) and inconclusive null results (underpowered studies).
 
 ---

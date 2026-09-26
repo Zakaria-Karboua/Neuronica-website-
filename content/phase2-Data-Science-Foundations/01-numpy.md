@@ -24,6 +24,7 @@ Every feature matrix you feed into an XGBoost model, every gradient computation 
 
 ### The `ndarray`: what makes it fast
 An `ndarray` is: a pointer to a single contiguous block of memory, a `dtype` (fixed element type — `float64`, `int32`, etc.), a `shape` tuple, and a `strides` tuple (bytes to step to move one index along each axis). Because every element has the same type and fixed size, NumPy can compute any element's memory address in $O(1)$ via:
+
 $$
 \text{address}(i_1, \dots, i_n) = \text{base} + \sum_{k=1}^{n} i_k \cdot \text{strides}_k
 $$
@@ -46,16 +47,20 @@ Slicing (`a[1:3]`) returns a **view** (shares memory with the original — mutat
 
 ### Linear algebra as NumPy's core vocabulary
 NumPy directly implements vector/matrix operations foundational to virtually all ML math (deepened formally in Phase 3):
+
 $$
 (A B)_{ij} = \sum_{k} A_{ik} B_{kj} \qquad \text{— matrix multiplication, } O(n^3) \text{ naively}
 $$
+
 NumPy's `@`/`np.matmul` dispatches to BLAS (Basic Linear Algebra Subprograms — highly optimized C/Fortran, often further using multi-threading and hardware-specific SIMD/AVX instructions), which is why `A @ B` on 1000×1000 matrices is dramatically faster than any hand-written Python triple loop performing the same $O(n^3)$ work — same complexity class, vastly better constant factor.
 
 ### Numerical stability
 Floating-point arithmetic (IEEE-754, revisited from Phase 1 Lesson 1) means naive formulas can be numerically unstable. Example: computing variance via
+
 $$
 \text{Var}(X) = E[X^2] - (E[X])^2
 $$
+
 can suffer catastrophic cancellation when $E[X^2]$ and $(E[X])^2$ are both large and close in value, losing precision. NumPy's `np.var` uses a numerically stable two-pass algorithm (compute mean first, then sum squared deviations) specifically to avoid this — a small but real illustration of why "just use the library function" beats reimplementing textbook formulas naively.
 
 ### Complexity of core operations

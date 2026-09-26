@@ -42,27 +42,36 @@ Real datasets — insurance claims, clinical records, financial transactions —
 ## 3. Mathematical Foundations
 
 ### IQR (Interquartile Range) outlier rule
+
 $$
 \text{IQR} = Q_3 - Q_1, \quad \text{outlier if } x < Q_1 - 1.5 \cdot \text{IQR} \text{ or } x > Q_3 + 1.5 \cdot \text{IQR}
 $$
+
 This is a distribution-free (non-parametric) rule, robust to non-normal data — preferable to a naive $\pm 3\sigma$ rule when data is skewed (as claims/financial data typically is).
 
 ### Z-score outlier rule (assumes approximate normality)
+
 $$
 z = \frac{x - \mu}{\sigma}, \quad \text{flag if } |z| > k \text{ (commonly } k=3\text{)}
 $$
+
 **Caveat**: $\mu$ and $\sigma$ computed from data *containing* the outliers are themselves distorted by them (non-robust statistics) — a chicken-and-egg problem. **Robust alternative**: use the median and MAD (Median Absolute Deviation):
+
 $$
 \text{MAD} = \text{median}(|x_i - \text{median}(x)|), \quad z_{\text{robust}} = \frac{0.6745 (x - \text{median}(x))}{\text{MAD}}
 $$
+
 The constant $0.6745$ makes $z_{\text{robust}}$ comparable to a standard z-score under normality, while median/MAD remain far less sensitive to the very outliers you're trying to detect.
 
 ### Fuzzy matching for duplicate detection
 Levenshtein (edit) distance between two strings $s_1, s_2$:
+
 $$
 \text{lev}(s_1, s_2) = \text{minimum number of single-character insertions, deletions, substitutions to transform } s_1 \to s_2
 $$
+
 Computed via dynamic programming (direct callback to Phase 1 Lesson 4's DP concept) in $O(|s_1| \cdot |s_2|)$ time, using the recurrence:
+
 $$
 D(i,j) = \min \begin{cases} D(i-1,j) + 1 \\ D(i,j-1) + 1 \\ D(i-1,j-1) + \mathbb{1}[s_1[i] \ne s_2[j]] \end{cases}
 $$

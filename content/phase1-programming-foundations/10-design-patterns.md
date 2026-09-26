@@ -50,9 +50,11 @@ Several patterns can be viewed through composition: the **Strategy** pattern is 
 
 ### Composite pattern and recursive structures
 The Composite pattern formalizes a recursive tree: if $T$ is a `Component`, then a `Composite` is defined as
+
 $$
 T ::= \text{Leaf} \;\mid\; \text{Composite}(T_1, T_2, \dots, T_k)
 $$
+
 This is exactly the recursive grammar behind a parse tree/AST (Lesson 8's `ast` module) or a neural network's module tree (`nn.Sequential` containing other `nn.Module`s) — operations like `forward()` or `total_parameters()` are computed via recursive tree traversal, $O(n)$ in the number of nodes.
 
 ### Observer pattern and event complexity

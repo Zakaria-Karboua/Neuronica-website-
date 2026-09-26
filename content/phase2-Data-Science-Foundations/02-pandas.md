@@ -39,9 +39,11 @@ Every dataset you've worked with (claims files, exchange-rate time series, cardi
 
 ### GroupBy as a partition + function application
 Given a dataset $D$ and a key function $k$, GroupBy partitions $D$ into equivalence classes:
+
 $$
 D = \bigsqcup_{v \in \text{range}(k)} \{ d \in D : k(d) = v \}
 $$
+
 then applies an aggregate $f$ to each class. This is set-theoretically identical to the `GROUP BY` operator from Phase 1's SQL lesson — pandas' GroupBy and SQL's GROUP BY are the same mathematical operation with different syntax.
 
 ### Complexity of core operations

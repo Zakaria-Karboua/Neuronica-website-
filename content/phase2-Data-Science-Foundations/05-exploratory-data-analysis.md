@@ -30,16 +30,20 @@ Before building your XGBoost mortality model or your Brent oil forecasting pipel
 5. **Hypothesis formation** — write down concrete, testable hypotheses ("region affects claim severity," "age has a non-linear relationship with mortality risk") to carry into Phase 4's formal modeling.
 
 ### Skewness and kurtosis (quantifying distribution shape)
+
 $$
 \text{Skewness} = \frac{E[(X - \mu)^3]}{\sigma^3}, \qquad \text{Kurtosis} = \frac{E[(X - \mu)^4]}{\sigma^4}
 $$
+
 Skewness > 0: right-tailed (typical of claims/income data — a few large values pull the tail right). Kurtosis > 3 ("leptokurtic," excess kurtosis > 0): heavier tails than normal — a direct early warning sign that Phase 3's Extreme Value Theory tools may be more appropriate than naive Gaussian assumptions for that variable.
 
 ### Correlation vs. causation, and correlation's own limitations
 Pearson correlation $\rho$ only captures *linear* relationships:
+
 $$
 \rho_{X,Y} = \frac{\text{Cov}(X,Y)}{\sigma_X \sigma_Y}
 $$
+
 A near-zero Pearson correlation does **not** imply no relationship (Anscombe's Quartet, Lesson 4, is the canonical proof) — a genuinely strong non-linear (e.g., quadratic, threshold) relationship can have $\rho \approx 0$. Spearman rank correlation (based on ranks, not raw values) captures monotonic-but-nonlinear relationships and is more robust to outliers.
 
 ---
@@ -48,9 +52,11 @@ A near-zero Pearson correlation does **not** imply no relationship (Anscombe's Q
 
 ### Data leakage as a formal concept
 A feature $X_j$ **leaks** target information if $X_j$ is computed using information that would not be available at prediction time — formally, if
+
 $$
 X_j = g(Y, \dots) \text{ for some function } g \text{, even indirectly}
 $$
+
 Detecting leakage during EDA typically shows up as a suspiciously *too-good* correlation or a suspiciously *too-good* early model performance (Phase 4's evaluation lessons formalize this further) — EDA's job is to raise the flag before you waste a training run on a leaked feature.
 
 ### Multivariate structure: covariance matrix
@@ -58,9 +64,11 @@ For $p$ features, the $p \times p$ covariance matrix $\Sigma$ where $\Sigma_{ij}
 
 ### The Central Limit Theorem as an EDA sanity-check tool
 Aggregated quantities (means of samples) tend toward normality regardless of the underlying distribution's shape, as $n \to \infty$:
+
 $$
 \frac{\bar{X}_n - \mu}{\sigma / \sqrt{n}} \xrightarrow{d} N(0, 1)
 $$
+
 This is *why* group-level means in EDA (e.g., "average claim by region") can look deceptively smooth/normal even when the underlying per-claim distribution is wildly skewed — an important EDA trap: always inspect the *raw* per-observation distribution, not just aggregated summaries, before concluding a variable is "well-behaved."
 
 ---

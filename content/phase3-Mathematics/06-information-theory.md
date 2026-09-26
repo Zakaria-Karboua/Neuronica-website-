@@ -24,27 +24,35 @@ When you train a classifier with "cross-entropy loss," you are literally minimiz
 
 ### Entropy — quantifying uncertainty
 For a discrete random variable $X$ with distribution $p$:
+
 $$
 H(X) = -\sum_x p(x)\log p(x)
 $$
+
 Entropy is maximized when $p$ is uniform (maximum uncertainty — you have no idea which outcome will occur) and is zero when $p$ is a point mass (no uncertainty — you know exactly what will happen). Units depend on the log base: base 2 gives **bits**, natural log gives **nats** (the ML-conventional choice).
 
 ### Cross-entropy — comparing a true distribution to a predicted one
+
 $$
 H(p, q) = -\sum_x p(x)\log q(x)
 $$
+
 where $p$ is the true distribution and $q$ is your model's predicted distribution. **This is literally the standard classification loss function** — for a single labeled example (a one-hot true distribution $p$), cross-entropy simplifies to $-\log q(y_{\text{true}})$, the negative log-probability the model assigned to the correct class.
 
 ### KL Divergence — the "distance" between distributions
+
 $$
 D_{KL}(p \| q) = \sum_x p(x)\log\frac{p(x)}{q(x)} = H(p,q) - H(p)
 $$
+
 KL divergence is always $\ge 0$ (Gibbs' inequality), equal to zero **only** when $p = q$ exactly. It is **not symmetric** ($D_{KL}(p\|q) \ne D_{KL}(q\|p)$ in general), so it's not a true mathematical "distance" (metric) despite behaving somewhat like one — a subtlety with real consequences in variational inference and generative model training (Phase 6-7), where the choice of direction ($D_{KL}(p\|q)$ vs. $D_{KL}(q\|p)$) produces qualitatively different behavior (mode-covering vs. mode-seeking).
 
 ### Mutual Information — quantifying shared information between variables
+
 $$
 I(X;Y) = \sum_{x,y} p(x,y)\log\frac{p(x,y)}{p(x)p(y)} = H(X) - H(X|Y)
 $$
+
 $I(X;Y)$ measures how much knowing $Y$ reduces uncertainty about $X$ (and vice versa — it's symmetric) — zero exactly when $X \perp Y$ (independent, Phase 3 Lesson 3). Used directly for feature selection (Phase 4): features with high mutual information with the target carry genuinely useful, potentially non-linear predictive signal that a simple correlation coefficient (Phase 2 Lesson 5) might completely miss.
 
 ---
@@ -53,28 +61,36 @@ $I(X;Y)$ measures how much knowing $Y$ reduces uncertainty about $X$ (and vice v
 
 ### Why cross-entropy loss equals negative log-likelihood (the crucial unification)
 For classification with true label $y$ and predicted probability $q(y)$ for the correct class, the cross-entropy loss for one example is:
+
 $$
 L = -\log q(y)
 $$
+
 This is *exactly* the negative log-likelihood term from Phase 3 Lesson 3's Maximum Likelihood Estimation framework. **Training a classifier with cross-entropy loss and training it via maximum likelihood estimation under a categorical model are the same optimization problem** — not a coincidence, not an analogy, but literally identical mathematics viewed from two historical traditions (information theory vs. statistics) that converge on the same objective function.
 
 ### KL divergence decomposition (why minimizing cross-entropy also minimizes KL divergence)
+
 $$
 D_{KL}(p\|q) = H(p,q) - H(p)
 $$
+
 Since $H(p)$ (the true distribution's own entropy) doesn't depend on your model's parameters, minimizing cross-entropy $H(p,q)$ with respect to model parameters is *equivalent* to minimizing $D_{KL}(p\|q)$ — training a classifier is, precisely, minimizing the KL divergence between the true and predicted distributions.
 
 ### Gibbs' inequality (proving $D_{KL} \ge 0$)
 Using the fact that $\log$ is concave (Jensen's inequality):
+
 $$
 -D_{KL}(p\|q) = \sum_x p(x)\log\frac{q(x)}{p(x)} \le \log\left(\sum_x p(x)\frac{q(x)}{p(x)}\right) = \log\left(\sum_x q(x)\right) = \log(1) = 0
 $$
+
 so $D_{KL}(p\|q) \ge 0$, with equality iff $p=q$ almost everywhere (Jensen's equality condition, since $q(x)/p(x)$ must be constant). This inequality is the theoretical bedrock guaranteeing that minimizing cross-entropy loss is a *sound* objective — it has a well-defined global minimum exactly when predictions match reality.
 
 ### Perplexity — the ML-practitioner-friendly reframing of cross-entropy
+
 $$
 \text{Perplexity} = 2^{H(p,q)} \quad \text{(or } e^{H(p,q)}\text{ using nats)}
 $$
+
 A language model's perplexity (Phase 6) is literally an exponentiated cross-entropy — interpretable as "the model is, on average, as uncertain as if choosing uniformly among this many options" — a genuinely intuitive way to communicate an information-theoretic quantity to non-specialists.
 
 ---

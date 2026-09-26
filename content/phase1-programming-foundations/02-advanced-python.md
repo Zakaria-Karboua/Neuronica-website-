@@ -37,15 +37,19 @@ When you later read FastAPI's `@app.post(...)` or PyTorch's `@torch.no_grad()`, 
 Concurrency correctness is a discrete-systems reasoning problem more than a numerical one, but two formalisms matter:
 
 ### Amdahl's Law (parallel speedup ceiling)
+
 $$
 S(n) = \frac{1}{(1-p) + \frac{p}{n}}
 $$
+
 where $p$ is the parallelizable fraction of the program and $n$ the number of processors. This explains why multiprocessing gives real speedups for CPU-bound work but threading does not (in standard CPython) for CPU-bound work due to the GIL — $p \to 0$ for GIL-bound sections.
 
 ### Little's Law (queueing, relevant to async servers)
+
 $$
 L = \lambda W
 $$
+
 Average number of in-flight requests $L$ equals arrival rate $\lambda$ times average time-in-system $W$. This underlies why async I/O (handling thousands of concurrent slow requests, e.g., waiting on an LLM API call) scales throughput without needing thousands of OS threads — it minimizes $W$ spent idly blocked.
 
 ### Amortized complexity of `functools.lru_cache`

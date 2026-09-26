@@ -43,13 +43,16 @@ Interview processes at every major AI lab still test DSA fundamentals — but mo
 ## 3. Mathematical Foundations
 
 ### Big-O, Big-Ω, Big-Θ
+
 $$
 f(n) = \Theta(g(n)) \iff f(n) = O(g(n)) \text{ and } f(n) = \Omega(g(n))
 $$
+
 $\Theta$ gives a *tight* bound (both upper and lower), which is what you should aim to reason about, not just worst-case $O$.
 
 ### Master Theorem (for divide-and-conquer recurrences)
 For $T(n) = aT(n/b) + f(n)$:
+
 $$
 T(n) =
 \begin{cases}
@@ -58,6 +61,7 @@ T(n) =
 \Theta(f(n)) & \text{if } f(n) = \Omega(n^{\log_b a + \epsilon})
 \end{cases}
 $$
+
 Applied to merge sort ($a=2, b=2, f(n)=n$): $\log_b a = 1$, $f(n) = \Theta(n^1)$ → case 2 → $T(n) = \Theta(n \log n)$.
 
 ### Expected complexity of hashing under uniform hashing assumption

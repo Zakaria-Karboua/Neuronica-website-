@@ -54,6 +54,8 @@ Every Git object's identity is `SHA-1(object_type + " " + length + "\0" + conten
 $$
 \text{commit}_n \to \text{tree}_n \to \{\text{blob or tree}, ...\}
 $$
+
+
 $$
 \text{commit}_n.\text{parent} = \text{commit}_{n-1}
 $$

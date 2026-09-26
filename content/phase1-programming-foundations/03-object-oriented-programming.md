@@ -35,9 +35,11 @@ Every neural network you build in PyTorch is a Python class inheriting from `nn.
 
 ### C3 Linearization (Method Resolution Order)
 For multiple inheritance `class D(B, C)` where `B(A)`, `C(A)`, Python computes MRO via:
+
 $$
 L[D] = D + \text{merge}(L[B], L[C], [B, C])
 $$
+
 where `merge` takes the head of the first list that does not appear in the tail of any other list, repeating until all lists are consumed. This guarantees a *monotonic, consistent* linearization — avoiding the classic "diamond problem" ambiguity of C++.
 
 ```python

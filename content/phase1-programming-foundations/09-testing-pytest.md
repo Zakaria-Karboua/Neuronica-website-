@@ -42,16 +42,20 @@ ML code has unique testing challenges beyond typical software: you must test not
 
 ### Coverage as a set-cover problem
 If $P$ = the set of all executable paths through a program, and each test $t_i$ exercises a subset $S_i \subseteq P$, then achieving "$k\%$ path coverage" is a set-cover problem:
+
 $$
 \bigcup_i S_i \supseteq k\% \text{ of } P
 $$
+
 Full path coverage is generally intractable for realistic programs (paths grow exponentially with branching — Lesson 8's cyclomatic complexity directly predicts this), which is *why* line/branch coverage (weaker, tractable proxies) are used in practice instead of full path coverage.
 
 ### Statistical testing of ML models
 Unlike deterministic software, ML model outputs are often stochastic or approximate. Testing a model's *quality* (not just "does it run") requires statistical reasoning:
+
 $$
 H_0: \text{new model performance} \le \text{baseline performance}
 $$
+
 Rejecting $H_0$ (e.g., via a paired t-test or bootstrap confidence interval on a held-out metric) with a pre-registered significance threshold is the rigorous way to test "did this change actually improve the model" — a direct bridge to Phase 3 (Statistics) and Phase 4 (Model Evaluation).
 
 ### Flakiness and probability

@@ -33,9 +33,11 @@ A matrix $A \in \mathbb{R}^{m \times n}$ represents a linear map $T: \mathbb{R}^
 
 ### Eigenvalues and eigenvectors
 For a square matrix $A$, a nonzero vector $v$ is an **eigenvector** with **eigenvalue** $\lambda$ if:
+
 $$
 Av = \lambda v
 $$
+
 i.e., $A$ acts on $v$ purely by *scaling*, not rotating/shearing it. Eigenvectors reveal a matrix's "natural axes" — directly the mathematical basis of PCA (Phase 4) and central to understanding neural network weight-matrix conditioning (Phase 5).
 
 ### Matrix decompositions (the practical toolkit)
@@ -52,9 +54,11 @@ i.e., $A$ acts on $v$ purely by *scaling*, not rotating/shearing it. Eigenvector
 
 ### The Normal Equation (closed-form linear regression, derived)
 Given design matrix $X \in \mathbb{R}^{n \times p}$ and target $y \in \mathbb{R}^n$, minimize squared error $\|Xβ - y\|^2$. Taking the gradient and setting to zero:
+
 $$
 \nabla_\beta \|X\beta - y\|^2 = 2X^T(X\beta - y) = 0 \implies X^TX\beta = X^Ty \implies \beta = (X^TX)^{-1}X^Ty
 $$
+
 This is the "Normal Equation" you already used numerically in Phase 2's NumPy lesson (`np.linalg.solve(X.T@X, X.T@y)`) — now you see exactly where it comes from.
 
 ### SVD and PCA (the connection made explicit)
@@ -64,9 +68,11 @@ For a mean-centered data matrix $X$, the covariance matrix is $\Sigma = \frac{1}
 A quadratic form $x^TAx$ (appearing constantly in loss functions, e.g., ridge regression penalties, Gaussian log-likelihoods) can be analyzed via $A$'s eigenvalues: if all eigenvalues $\lambda_i > 0$, $A$ is **positive definite** and $x^TAx > 0$ for all $x \ne 0$ — meaning the corresponding quadratic loss surface is a convex bowl with a unique minimum, a property optimization algorithms (Lesson 5, this phase) depend on heavily.
 
 ### Norms
+
 $$
 \|x\|_1 = \sum_i |x_i| \quad \text{(L1, sparsity-inducing)}, \qquad \|x\|_2 = \sqrt{\sum_i x_i^2} \quad \text{(L2, Euclidean)}
 $$
+
 L1 regularization (Lasso, Phase 4) drives coefficients exactly to zero because of the L1 norm's non-differentiable "corner" at zero; L2 (Ridge) shrinks coefficients smoothly toward zero without eliminating them — a direct geometric consequence of each norm's unit-ball shape (a diamond vs. a circle in 2D).
 
 ---

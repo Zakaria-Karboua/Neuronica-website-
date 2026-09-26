@@ -39,9 +39,11 @@ Your XGBoost mortality model outputs a probability; a well-calibrated model's pr
 | Beta | modeling probabilities themselves (Bayesian priors for Bernoulli parameters) |
 
 ### Conditional probability and Bayes' theorem
+
 $$
 P(A|B) = \frac{P(A \cap B)}{P(B)}, \qquad P(A|B) = \frac{P(B|A)P(A)}{P(B)} \quad \text{(Bayes' theorem)}
 $$
+
 Bayes' theorem is the mathematical engine of updating belief given new evidence — foundational to Bayesian statistics, spam filters (Naive Bayes), and conceptually to how you should interpret any diagnostic test's predictive value (a classic, often misunderstood application: a positive test result's true meaning depends heavily on the base rate $P(A)$, not just the test's sensitivity).
 
 ### Independence and conditional independence
@@ -52,34 +54,46 @@ $X$ and $Y$ are independent if $P(X, Y) = P(X)P(Y)$ — knowing one gives no inf
 ## 3. Mathematical Foundations
 
 ### Expectation and variance
+
 $$
 E[X] = \sum_x x \cdot P(X=x) \quad \text{(discrete)}, \qquad E[X] = \int x f(x)\,dx \quad \text{(continuous)}
 $$
+
+
 $$
 \text{Var}(X) = E[(X - E[X])^2] = E[X^2] - (E[X])^2
 $$
+
 Linearity of expectation, $E[aX + bY] = aE[X] + bE[Y]$, holds **regardless of independence** — a frequently underappreciated fact that simplifies enormous amounts of probabilistic reasoning (e.g., expected total claims across policyholders, even if claims are correlated).
 
 ### Law of Large Numbers and Central Limit Theorem (formalized)
+
 $$
 \bar{X}_n \xrightarrow{p} \mu \quad \text{(LLN: sample mean converges to true mean)}
 $$
+
+
 $$
 \sqrt{n}(\bar{X}_n - \mu) \xrightarrow{d} N(0, \sigma^2) \quad \text{(CLT: properly scaled, converges to Gaussian)}
 $$
+
 The CLT is *why* Gaussian assumptions are so pervasive in statistics (Phase 3 Lesson 4) despite most real data being non-Gaussian — aggregated quantities (means, sums) tend toward normality regardless of the underlying distribution, under fairly general conditions (finite variance).
 
 ### Maximum Likelihood Estimation (MLE) — the unifying estimation principle
 Given i.i.d. data $x_1, \dots, x_n$ from a distribution with unknown parameter $\theta$, the likelihood is:
+
 $$
 L(\theta) = \prod_{i=1}^n f(x_i; \theta), \qquad \hat{\theta}_{MLE} = \arg\max_\theta L(\theta) = \arg\max_\theta \sum_i \log f(x_i; \theta)
 $$
+
 Taking the log (log-likelihood) converts a product into a sum — both for numerical stability (products of many small probabilities underflow to zero) and analytical tractability (derivatives of sums are easier than derivatives of products). **This is the exact framework that derives most ML loss functions**: minimizing cross-entropy loss for classification is *equivalent* to maximum likelihood estimation under a categorical/Bernoulli model — not a coincidence, but the same mathematical object viewed two ways.
 
 ### Bayesian inference formalized
+
 $$
 \underbrace{P(\theta | D)}_{\text{posterior}} \propto \underbrace{P(D|\theta)}_{\text{likelihood}} \cdot \underbrace{P(\theta)}_{\text{prior}}
 $$
+
 Unlike MLE (a single point estimate), Bayesian inference maintains a full distribution over $\theta$, naturally quantifying uncertainty — directly relevant to actuarial reserving (credibility theory is fundamentally Bayesian: blending a company's own limited claims experience with broader industry priors, weighted by data volume).
 
 ---

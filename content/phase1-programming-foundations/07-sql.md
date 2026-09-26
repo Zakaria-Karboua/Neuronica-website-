@@ -56,9 +56,11 @@ SQL operations map directly onto relational algebra operators, which are themsel
 - Set difference $R - S$ → SQL `EXCEPT`
 
 A join's formal definition:
+
 $$
 R \bowtie_{\theta} S = \{ t_r \cup t_s : t_r \in R, t_s \in S, \theta(t_r, t_s) \text{ holds} \}
 $$
+
 where $\theta$ is the join predicate (e.g., `R.id = S.id`). Naively this is $O(|R| \times |S|)$ (nested loop join); real query planners use hash joins ($O(|R| + |S|)$ expected, building a hash table on the smaller table — directly reusing Lesson 4's hash-table complexity) or sort-merge joins ($O(n \log n)$) depending on data size, indexes, and distribution statistics.
 
 ### Query planning as combinatorial optimization

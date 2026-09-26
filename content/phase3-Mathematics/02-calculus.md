@@ -27,9 +27,11 @@ For $f: \mathbb{R} \to \mathbb{R}$, the derivative $f'(x) = \lim_{h\to 0}\frac{f
 
 ### The chain rule (the single most important rule for ML)
 For composed functions $y = f(g(x))$:
+
 $$
 \frac{dy}{dx} = \frac{dy}{du}\cdot\frac{du}{dx}, \quad u = g(x)
 $$
+
 For a chain of many compositions (exactly a neural network's layer structure), the chain rule extends to a product of Jacobians — this is precisely backpropagation (Phase 5), computed efficiently via the two conventions below.
 
 ### Forward-mode vs. reverse-mode automatic differentiation
@@ -45,9 +47,11 @@ For a chain of many compositions (exactly a neural network's layer structure), t
 ## 3. Mathematical Foundations
 
 ### Taylor series (the foundation of optimization theory)
+
 $$
 f(x + \Delta x) \approx f(x) + \nabla f(x)^T \Delta x + \frac{1}{2}\Delta x^T H(x) \Delta x + O(\|\Delta x\|^3)
 $$
+
 The first-order term justifies gradient descent (moving opposite the gradient locally decreases $f$); the second-order term is what Newton's method (Lesson 5) exploits for faster convergence by directly accounting for curvature.
 
 ### Critical points and the Hessian's role
@@ -60,10 +64,12 @@ This directly connects to Lesson 1's eigenvalue theory: analyzing a loss landsca
 
 ### Backpropagation, derived explicitly for a 2-layer network
 Given $z_1 = W_1 x$, $a_1 = \sigma(z_1)$, $z_2 = W_2 a_1$, $\hat{y} = \sigma(z_2)$, loss $L = \ell(\hat y, y)$:
+
 $$
 \frac{\partial L}{\partial W_2} = \frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial z_2}\frac{\partial z_2}{\partial W_2}, \qquad
 \frac{\partial L}{\partial W_1} = \underbrace{\frac{\partial L}{\partial \hat y}\frac{\partial \hat y}{\partial z_2}}_{\delta_2}\frac{\partial z_2}{\partial a_1}\frac{\partial a_1}{\partial z_1}\frac{\partial z_1}{\partial W_1}
 $$
+
 Notice $\delta_2$ (the "error signal" at layer 2) is *reused* when computing $\partial L/\partial W_1$ — this reuse of intermediate quantities, propagated backward through the network, is exactly what makes reverse-mode differentiation efficient: $O(\text{network size})$ total cost, not exponential in depth.
 
 ---
